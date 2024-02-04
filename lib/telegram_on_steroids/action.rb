@@ -62,6 +62,7 @@ module TelegramOnSteroids
       def respond_with_keyboard(text: '', keyboard:)
         inline_keyboard = keyboard.new(request:).to_telegram_format
         message_id = request.params.to_h.dig('callback_query', 'message', 'message_id')
+
         if message_id
           client.edit_message_text message_id:, text:, reply_markup: { inline_keyboard: }
         else
@@ -99,6 +100,10 @@ module TelegramOnSteroids
 
       def redirect_to=(klass)
         @redirect_to = klass
+      end
+
+      def step(step_name, &block)
+        define_method(step_name, &block)
       end
 
       attr_accessor :request, :client, :session

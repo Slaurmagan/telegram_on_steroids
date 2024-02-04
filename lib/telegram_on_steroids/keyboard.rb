@@ -19,9 +19,8 @@ module TelegramOnSteroids
     end
 
     class Configuration
-      def initialize(buttons: [], paginatable: false)
-        @buttons = buttons
-        @paginatable = paginatable
+      def initialize
+        @buttons = []
       end
 
       def add_button(button)

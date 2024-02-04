@@ -19,7 +19,7 @@ module TelegramOnSteroids
       end
 
       def per_page
-        @per_page ||= 1
+        @per_page ||= 2
       end
 
       def per_page=(val)
@@ -33,7 +33,7 @@ module TelegramOnSteroids
       end
 
       def offset
-        current_page - 1 * per_page
+        (current_page - 1) * per_page
       end
 
       def last_page?
