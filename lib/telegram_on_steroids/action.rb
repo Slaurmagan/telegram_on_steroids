@@ -1,11 +1,17 @@
+require 'forwardable'
+
 module TelegramOnSteroids
   class Action
-    def initialize(client, session)
+    extend Forwardable
+
+    def initialize(request, client, session)
       @client = client
       @session = session
       @action = self.class.action
+      @request = request
       set_session!
       set_client!
+      set_request!
     end
 
     def set_session!
@@ -16,7 +22,13 @@ module TelegramOnSteroids
       action.client = client
     end
 
-    attr_reader :client, :session, :action
+    def set_request!
+      action.request = request
+    end
+
+    attr_reader :client, :session, :action, :request
+
+    def_delegators :@request, :params
 
     def respond_to_missing?(name, include_private = false)
       @action.respond_to?(name, include_private)
@@ -48,12 +60,17 @@ module TelegramOnSteroids
       end
 
       def respond_with_keyboard(text: '', keyboard:)
-        client.send_message text:, reply_markup: { inline_keyboard: keyboard.to_telegram_format }
+        inline_keyboard = keyboard.new(request:).to_telegram_format
+        message_id = request.params.to_h.dig('callback_query', 'message', 'message_id')
+        if message_id
+          client.edit_message_text message_id:, text:, reply_markup: { inline_keyboard: }
+        else
+          client.send_message text:, reply_markup: { inline_keyboard: }
+        end
       end
 
-      def on(step_name, proc)
-        filters[step_name] ||= []
-        filters[step_name].push({ type: :on, proc: })
+      def answer_callback_query(**params)
+        client.answer_callback_query callback_query_id: request.params.to_h.dig('callback_query', 'id'), **params
       end
 
       def on_redirect(&block)
@@ -69,20 +86,23 @@ module TelegramOnSteroids
       end
 
       def __run_on_redirect
-        @on_redirect.call(self) if @on_redirect
+        @on_redirect.call(request, self) if @on_redirect
       end
 
       def __run_on_message
-        @on_message.call(self) if @on_message
+        @on_message.call(request, self) if @on_message
       end
 
       def __run_on_callback
-        @on_callback.call(self) if @on_message
+        @on_callback.call(request, self) if @on_callback
       end
 
-      attr_reader :proc
+      def redirect_to=(klass)
+        @redirect_to = klass
+      end
 
-      attr_accessor :client, :session
+      attr_accessor :request, :client, :session
+      attr_reader :redirect_to
     end
   end
 end

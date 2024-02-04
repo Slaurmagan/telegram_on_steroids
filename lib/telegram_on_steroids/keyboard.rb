@@ -1,26 +1,39 @@
 module TelegramOnSteroids
   class Keyboard
     class << self
-      def keyboard
-        @keyboard ||= Keyboard.new
+      def configuration
+        @keyboard ||= Configuration.new
       end
 
       def configure
-        yield keyboard
+        yield configuration
       end
 
       private
 
       def method_missing(symbol, *args)
-        raise NotImplementedError unless keyboard.respond_to?(symbol)
+        raise NotImplementedError unless configuration.respond_to?(symbol)
 
-        keyboard.send(symbol, *args)
+        configuration.send(symbol, *args)
       end
     end
 
-    def initialize(buttons: [], paginatable: false)
+    class Configuration
+      def initialize(buttons: [], paginatable: false)
+        @buttons = buttons
+        @paginatable = paginatable
+      end
+
+      def add_button(button)
+        @buttons.push(button)
+      end
+
+      attr_reader :buttons
+    end
+
+    def initialize(request:, buttons: self.class.buttons)
+      @request = request
       @buttons = buttons
-      @paginatable = paginatable
     end
 
     def add_button(button)
@@ -31,7 +44,6 @@ module TelegramOnSteroids
       [buttons]
     end
 
-    attr_accessor :paginatable
-    attr_reader :buttons
+    attr_reader :buttons, :request
   end
 end

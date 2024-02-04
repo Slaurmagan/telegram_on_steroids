@@ -1,5 +1,6 @@
 require_relative './telegram_on_steroids/keyboard'
 require_relative './telegram_on_steroids/keyboards/inline_keyboard'
+require_relative './telegram_on_steroids/keyboards/paginatable'
 require_relative './telegram_on_steroids/action'
 require_relative './telegram_on_steroids/client'
 require_relative './telegram_on_steroids/params'
