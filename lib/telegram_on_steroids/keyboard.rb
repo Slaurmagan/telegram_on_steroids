@@ -49,10 +49,10 @@ module TelegramOnSteroids
       attr_reader :buttons
     end
 
-    def initialize(request:, buttons: self.class.buttons, text: self.class.text)
+    def initialize(request:, configuration: self.class.configuration)
       @request = request
-      @buttons = buttons
-      @text = text
+      @configuration = configuration
+      @buttons = configuration.buttons
     end
 
     def add_button(button)
@@ -63,6 +63,10 @@ module TelegramOnSteroids
       buttons
     end
 
-    attr_reader :buttons, :request, :text
+    def text
+      instance_eval(&configuration.text)
+    end
+
+    attr_reader :buttons, :request, :configuration
   end
 end

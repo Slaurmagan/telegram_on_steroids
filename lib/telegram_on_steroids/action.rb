@@ -63,12 +63,13 @@ module TelegramOnSteroids
         keyboard_instance = keyboard.new(request:)
         inline_keyboard = keyboard_instance.to_telegram_format
         message_id = request.params.to_h.dig('callback_query', 'message', 'message_id')
+        text = keyboard_instance.text
 
         if message_id
-          client.edit_message_text message_id:, text: keyboard_instance.text, reply_markup: { inline_keyboard: }
+          client.edit_message_text message_id:, text:, reply_markup: { inline_keyboard: }
           session.write(:keyboard, keyboard.name)
         else
-          client.send_message text: keyboard_instance.text, reply_markup: { inline_keyboard: }
+          client.send_message text:, reply_markup: { inline_keyboard: }
           session.write(:keyboard, keyboard.name)
         end
       end
