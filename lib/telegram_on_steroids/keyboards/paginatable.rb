@@ -1,14 +1,16 @@
 module TelegramOnSteroids
   module Keyboards
     module Paginatable
+      DEFAULT_PER_PAGE = 2
+
       def paginatable
         true
       end
 
       def to_telegram_format
-        return [buttons] if first_page? && last_page?
+        return buttons if first_page? && last_page?
 
-        [buttons[offset...offset + per_page]].push(navigation_buttons)
+        buttons[offset...offset + per_page].push(navigation_buttons)
       end
 
       def navigation_buttons
@@ -19,7 +21,7 @@ module TelegramOnSteroids
       end
 
       def per_page
-        @per_page ||= 2
+        @per_page ||= self.class.configuration.per_page || DEFAULT_PER_PAGE
       end
 
       def per_page=(val)

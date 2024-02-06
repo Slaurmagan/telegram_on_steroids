@@ -59,14 +59,17 @@ module TelegramOnSteroids
         client.send_message params
       end
 
-      def respond_with_keyboard(text: '', keyboard:)
-        inline_keyboard = keyboard.new(request:).to_telegram_format
+      def respond_with_keyboard(text: '', keyboard: current_keyboard)
+        keyboard_instance = keyboard.new(request:)
+        inline_keyboard = keyboard_instance.to_telegram_format
         message_id = request.params.to_h.dig('callback_query', 'message', 'message_id')
 
         if message_id
-          client.edit_message_text message_id:, text:, reply_markup: { inline_keyboard: }
+          client.edit_message_text message_id:, text: keyboard_instance.text, reply_markup: { inline_keyboard: }
+          session.write(:keyboard, keyboard.name)
         else
-          client.send_message text:, reply_markup: { inline_keyboard: }
+          client.send_message text: keyboard_instance.text, reply_markup: { inline_keyboard: }
+          session.write(:keyboard, keyboard.name)
         end
       end
 
@@ -95,15 +98,23 @@ module TelegramOnSteroids
       end
 
       def __run_on_callback
+        return respond_with_keyboard if pagination_callback? && current_keyboard
+
         @on_callback.call(request, self) if @on_callback
+      end
+
+      def pagination_callback?
+        request.params.callback_data =~ /page/
+      end
+
+      def current_keyboard
+        return unless session.read(:keyboard)
+
+        Object.const_get(session.read(:keyboard))
       end
 
       def redirect_to=(klass)
         @redirect_to = klass
-      end
-
-      def step(step_name, &block)
-        define_method(step_name, &block)
       end
 
       attr_accessor :request, :client, :session

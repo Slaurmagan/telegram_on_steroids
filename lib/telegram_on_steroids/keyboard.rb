@@ -23,16 +23,36 @@ module TelegramOnSteroids
         @buttons = []
       end
 
-      def add_button(button)
-        @buttons.push(button)
+      def button(button)
+        buttons.push([button])
+      end
+
+      def row
+        row = Row.new
+        yield row
+        buttons.push(row.buttons)
+      end
+
+      attr_reader :buttons
+      attr_accessor :text, :per_page
+    end
+
+    class Row
+      def initialize
+        @buttons = []
+      end
+
+      def button(button)
+        buttons.push(button)
       end
 
       attr_reader :buttons
     end
 
-    def initialize(request:, buttons: self.class.buttons)
+    def initialize(request:, buttons: self.class.buttons, text: self.class.text)
       @request = request
       @buttons = buttons
+      @text = text
     end
 
     def add_button(button)
@@ -40,9 +60,9 @@ module TelegramOnSteroids
     end
 
     def to_telegram_format
-      [buttons]
+      buttons
     end
 
-    attr_reader :buttons, :request
+    attr_reader :buttons, :request, :text
   end
 end
