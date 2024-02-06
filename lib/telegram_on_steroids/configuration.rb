@@ -22,7 +22,7 @@ module TelegramOnSteroids
 
   class Configuration
     attr_accessor :session_store, :logger, :client, :start_action, :webhook_url, :api_token,
-                  :webhook_params
+                  :webhook_params, :commands
 
     REQUIRED_PARAMS = %i(start_action api_token)
 

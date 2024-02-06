@@ -8,8 +8,8 @@ class TelegramOnSteroids::Process
     @client = TelegramOnSteroids.config.client.new(chat_id)
     @logger = TelegramOnSteroids.config.logger
 
-    if @params.start?
-      set_current_action(TelegramOnSteroids.config.start_action)
+    if TelegramOnSteroids.config.commands.keys.include?(params.message_text)
+      set_current_action(TelegramOnSteroids.config.commands[params.message_text])
     end
   end
 
