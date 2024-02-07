@@ -17,9 +17,7 @@ module TelegramOnSteroids
         end
 
         define_method("__run_on_#{name.to_s}") do
-          if name.to_s == 'callback'
-            return respond_with_keyboard if pagination_callback? && current_keyboard
-          end
+          return respond_with_keyboard if name.to_s == 'callback' && pagination_callback? && current_keyboard
 
           instance_eval(&block)
         end

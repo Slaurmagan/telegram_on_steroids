@@ -25,6 +25,7 @@ class TelegramOnSteroids::Process
     if params.callback?
       current_action.__run_on_callback
     else
+      session.write(:current_page, 1)
       current_action.__run_on_message
     end
 
