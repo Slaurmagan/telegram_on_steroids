@@ -1,72 +1,32 @@
 module TelegramOnSteroids
   class Keyboard
-    class << self
-      def configuration
-        @keyboard ||= Configuration.new
-      end
+    extend Configurable
 
-      def configure
-        yield configuration
-      end
+    callable :text
 
-      private
-
-      def method_missing(symbol, *args)
-        raise NotImplementedError unless configuration.respond_to?(symbol)
-
-        configuration.send(symbol, *args)
-      end
-    end
-
-    class Configuration
-      def initialize
-        @buttons = []
-      end
-
-      def button(button)
-        buttons.push([button])
-      end
-
-      def row
-        row = Row.new
-        yield row
-        buttons.push(row.buttons)
-      end
-
-      attr_reader :buttons
-      attr_accessor :text, :per_page
-    end
-
-    class Row
-      def initialize
-        @buttons = []
-      end
-
-      def button(button)
-        buttons.push(button)
-      end
-
-      attr_reader :buttons
-    end
-
-    def initialize(request:, configuration: self.class.configuration)
+    def initialize(request:, action:)
       @request = request
-      @configuration = configuration
-      @buttons = configuration.buttons
+      @buttons = []
+      @action = action
+      after_initialize
     end
 
-    def add_button(button)
-      @buttons.push(button)
+    def after_initialize; end
+
+    def button(**button)
+      @buttons.push([Button.new(**button, keyboard: self).to_telegram_format])
+    end
+
+    def row
+      row = Row.new(keyboard: self)
+      yield row
+      buttons.push(row.buttons)
     end
 
     def to_telegram_format
       buttons
     end
 
-    def text
-      instance_eval(&configuration.text)
-    end
-
-    attr_reader :buttons, :request, :configuration
+    attr_reader :buttons, :request, :action
   end
 end
