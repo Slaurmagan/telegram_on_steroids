@@ -36,18 +36,18 @@ module TelegramOnSteroids
     attr_reader :request, :client, :session
 
     def respond_with_keyboard(keyboard: current_keyboard)
-      keyboard_instance = keyboard.new(request:, action: self)
+      keyboard_instance = keyboard.is_a?(Class) ? keyboard.new(request:, action: self) : keyboard
       inline_keyboard = keyboard_instance.to_telegram_format
       message_id = request.params.to_h.dig('callback_query', 'message', 'message_id')
       text = keyboard_instance.text
+      session.write(:current_page, 1) unless keyboard == current_keyboard
 
       if message_id
         client.edit_message_text message_id:, text:, reply_markup: { inline_keyboard: }
-        session.write(:keyboard, keyboard.name)
       else
         client.send_message text:, reply_markup: { inline_keyboard: }
-        session.write(:keyboard, keyboard.name)
       end
+      session.write(:keyboard, keyboard.is_a?(Class) ? keyboard.name : keyboard.class.name)
     end
 
     def answer_callback_query(**params)

@@ -19,11 +19,10 @@ class TelegramOnSteroids::Process
   end
 
   def process
-    # run the shared step
     log_request
 
     if params.callback?
-      current_action.__run_on_callback
+      current_action.__run_on_callback if current_action.respond_to?(:__run_on_callback)
     else
       session.write(:current_page, 1)
       current_action.__run_on_message

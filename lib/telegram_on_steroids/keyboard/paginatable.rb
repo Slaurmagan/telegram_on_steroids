@@ -20,7 +20,7 @@ module TelegramOnSteroids::Keyboard::Paginatable
   end
 
   def per_page
-    @per_page ||= self.class.configuration.per_page || DEFAULT_PER_PAGE
+    @per_page || DEFAULT_PER_PAGE
   end
 
   def per_page=(val)
