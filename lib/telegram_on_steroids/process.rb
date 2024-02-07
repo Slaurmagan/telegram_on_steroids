@@ -47,7 +47,7 @@ class TelegramOnSteroids::Process
                                            TelegramOnSteroids.config.start_action
                                          end
 
-                          action_class.new(self, @client, session)
+                          action_class.new(request: self, client: @client, session:)
                         end
   end
 
@@ -56,7 +56,7 @@ class TelegramOnSteroids::Process
     set_current_step(nil)
     session.reset_flash
 
-    @current_action = action_class.new(self, @client, session)
+    @current_action = action_class.new(request: self, client: @client, session:)
   end
 
   def current_step
