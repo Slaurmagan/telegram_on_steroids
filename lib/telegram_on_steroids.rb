@@ -31,5 +31,5 @@ module TelegramOnSteroids
 
   def self.stop_updates
     @updates && @updates.stop = true
-    end
+  end
 end
