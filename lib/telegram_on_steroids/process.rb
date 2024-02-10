@@ -21,12 +21,13 @@ class TelegramOnSteroids::Process
   def process
     log_request
 
-    if params.callback?
-      current_action.__run_on_callback if current_action.respond_to?(:__run_on_callback)
+    if current_action.respond_to?("__run_on_#{params.type}".to_sym)
+      current_action.send("__run_on_#{params.type}".to_sym)
     else
-      session.write(:current_page, 1)
-      current_action.__run_on_message
+      current_action.__run_on_message if current_action.respond_to?(:__run_on_message)
     end
+
+    session.write(:current_page, 1) unless params.callback?
 
     if current_action.redirect_to
       do_redirect

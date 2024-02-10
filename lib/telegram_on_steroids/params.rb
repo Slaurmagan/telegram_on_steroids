@@ -51,6 +51,10 @@ class TelegramOnSteroids::Params
       @params["edited_channel_post"]
   end
 
+  def type
+    @type ||= (TelegramOnSteroids::UPDATE_TYPES & @params.keys).first
+  end
+
   def message_text
     message&.dig("text")
   end

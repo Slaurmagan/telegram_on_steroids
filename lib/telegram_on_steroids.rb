@@ -15,6 +15,8 @@ require_relative './telegram_on_steroids/version'
 require_relative './telegram_on_steroids/in_memory_store'
 
 module TelegramOnSteroids
+  UPDATE_TYPES = %w[message edited_message channel_post edited_channel_post message_reaction message_reaction_count inline_query chosen_inline_request callback_query shipping_query poll poll_answer my_chat_member chat_member chat_join_request chat_boost removed_chat_boost]
+
   def self.process(params)
     Process.new(params).process
   end

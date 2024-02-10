@@ -6,18 +6,17 @@ module TelegramOnSteroids
 
     attr_reader :client, :session, :action, :request
 
-    ALLOWED_CALLBACKS = %w[callback message redirect]
 
     class << self
       def on(name, &block)
-        raise StandardError, "#{name} not allowed callback" unless ALLOWED_CALLBACKS.include?(name.to_s)
+        raise StandardError, "#{name} not allowed callback" unless TelegramOnSteroids::UPDATE_TYPES.include?(name.to_s)
 
         define_method("on_#{name.to_s}") do
           instance_variable_set('@on_callback', block)
         end
 
         define_method("__run_on_#{name.to_s}") do
-          return respond_with_keyboard if name.to_s == 'callback' && pagination_callback? && current_keyboard
+          return respond_with_keyboard if request.params.callback? && pagination_callback? && current_keyboard
 
           instance_eval(&block)
         end
