@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "http"
   spec.add_dependency "retryable"
   spec.add_dependency "oj"
+  spec.add_dependency 'redis'
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
